@@ -2,45 +2,55 @@
 header('Content-Type: text/html; charset=UTF-8');
 
 $id = basename($_GET['id'] ?? '');
-$filePath = __DIR__ . "/quizzes/{$id}.xml";
+$filePath = "{$id}.php";
 
-if (!$id || !file_exists($filePath) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+$systemFiles = ['index.php', 'quiz.php', 'result.php'];
+
+function loadQuizFile($filePath) {
+    if (!file_exists($filePath)) return null;
+    $quiz = null;
+    $data = include $filePath;
+    if (is_array($data) && isset($data['questions'])) {
+        return $data;
+    }
+    if (isset($quiz) && is_array($quiz) && isset($quiz['questions'])) {
+        return $quiz;
+    }
+    return null;
+}
+
+if (!$id || in_array("{$id}.php", $systemFiles, true) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: index.php");
     exit;
 }
 
-libxml_use_internal_errors(true);
-$xml = simplexml_load_file($filePath);
-
-if (!$xml) {
+$quiz = loadQuizFile($filePath);
+if ($quiz === null) {
     header("Location: index.php");
     exit;
 }
 
 $userAnswers = $_POST['answers'] ?? [];
 $score = 0;
-$questions = $xml->questions->question ?? [];
-$total = count($questions);
+$total = count($quiz['questions']);
 $results = [];
 
-foreach ($questions as $idx => $q) {
-    $qType = (string)($q['type'] ?? 'radio');
-    $qText = (string)($q->text ?? '');
+foreach ($quiz['questions'] as $idx => $q) {
+    $type = $q['type'] ?? 'radio';
     $userAns = $userAnswers[$idx] ?? '';
 
-    if ($qType === 'multi_text') {
+    if ($type === 'multi_text') {
         $isCorrect = true;
         $userAnsList = [];
         $correctAnsList = [];
 
-        foreach ($q->inputs->input as $input) {
-            $key = (string)$input['key'];
-            $label = (string)($input['label'] ?? $key);
+        foreach ($q['inputs'] as $input) {
+            $key = $input['key'];
             $uVal = trim($userAns[$key] ?? '');
-            $cVal = trim((string)$input['answer']);
+            $cVal = trim($input['answer']);
 
-            $userAnsList[] = "{$label}: " . ($uVal !== '' ? $uVal : '未回答');
-            $correctAnsList[] = "{$label}: {$cVal}";
+            $userAnsList[] = "{$input['label']}: " . ($uVal !== '' ? $uVal : '未回答');
+            $correctAnsList[] = "{$input['label']}: {$cVal}";
 
             if ($uVal !== $cVal) {
                 $isCorrect = false;
@@ -50,21 +60,21 @@ foreach ($questions as $idx => $q) {
         if ($isCorrect) $score++;
 
         $results[] = [
-            'question' => $qText,
+            'question' => $q['question'],
             'user_answer' => implode(' / ', $userAnsList),
             'correct_answer' => implode(' / ', $correctAnsList),
             'is_correct' => $isCorrect
         ];
 
-    } elseif ($qType === 'text') {
+    } elseif ($type === 'text') {
         $uVal = trim(is_array($userAns) ? '' : $userAns);
-        $cVal = trim((string)$q->answer);
+        $cVal = trim($q['answer']);
         $isCorrect = ($uVal === $cVal);
 
         if ($isCorrect) $score++;
 
         $results[] = [
-            'question' => $qText,
+            'question' => $q['question'],
             'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
             'is_correct' => $isCorrect
@@ -72,13 +82,13 @@ foreach ($questions as $idx => $q) {
 
     } else {
         $uVal = is_array($userAns) ? '' : $userAns;
-        $cVal = (string)$q->answer;
+        $cVal = $q['answer'];
         $isCorrect = ($uVal === $cVal);
 
         if ($isCorrect) $score++;
 
         $results[] = [
-            'question' => $qText,
+            'question' => $q['question'],
             'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
             'is_correct' => $isCorrect
@@ -91,7 +101,7 @@ foreach ($questions as $idx => $q) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>結果発表 - <?= htmlspecialchars((string)($xml->title ?? ''), ENT_QUOTES, 'UTF-8') ?></title>
+  <title>結果発表 - <?= htmlspecialchars($quiz['title'], ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
