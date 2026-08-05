@@ -1,16 +1,35 @@
 <?php
-// 文字化け防止ヘッダーの出力
 header('Content-Type: text/html; charset=UTF-8');
 
-// __DIR__ を使って絶対パスで quizzes フォルダ内の JSON を検索
-$quizFiles = glob(__DIR__ . '/quizzes/*.json');
+// quizzes/*.xml を検索
+$quizFiles = glob(__DIR__ . '/quizzes/*.xml');
+if ($quizFiles === false || empty($quizFiles)) {
+    $quizFiles = glob('quizzes/*.xml');
+}
 $quizzes = [];
 
-if ($quizFiles !== false) {
+if ($quizFiles) {
     foreach ($quizFiles as $file) {
         $key = pathinfo($file, PATHINFO_FILENAME);
-        $json = file_get_contents($file);
-        $quizzes[$key] = json_decode($json, true);
+
+        libxml_use_internal_errors(true);
+        $xml = simplexml_load_file($file);
+
+        if ($xml !== false) {
+            $quizzes[$key] = [
+                'title' => (string)($xml->title ?? '無題'),
+                'description' => (string)($xml->description ?? ''),
+                'color' => (string)($xml->color ?? '#0078D7'),
+                'questions_count' => count($xml->questions->question ?? [])
+            ];
+        } else {
+            $quizzes[$key] = [
+                'title' => 'XML構文エラー',
+                'description' => 'XMLの解析に失敗しました。構文を確認してください。',
+                'color' => '#E81123',
+                'questions_count' => 0
+            ];
+        }
     }
 }
 ?>
@@ -35,16 +54,16 @@ if ($quizFiles !== false) {
       <div class="tile-grid">
         <?php if (!empty($quizzes)): ?>
           <?php foreach ($quizzes as $key => $quiz): ?>
-            <a href="quiz.php?id=<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" class="tile" style="background-color: <?= htmlspecialchars($quiz['color'] ?? '#0078D7', ENT_QUOTES, 'UTF-8') ?>;">
+            <a href="quiz.php?id=<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" class="tile" style="background-color: <?= htmlspecialchars($quiz['color'], ENT_QUOTES, 'UTF-8') ?>;">
               <div class="tile-content">
-                <h2><?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></h2>
-                <p><?= htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
-                <span class="badge"><?= count($quiz['questions'] ?? []) ?> 問</span>
+                <h2><?= htmlspecialchars($quiz['title'], ENT_QUOTES, 'UTF-8') ?></h2>
+                <p><?= htmlspecialchars($quiz['description'], ENT_QUOTES, 'UTF-8') ?></p>
+                <span class="badge"><?= $quiz['questions_count'] ?> 問</span>
               </div>
             </a>
           <?php endforeach; ?>
         <?php else: ?>
-          <p style="color: #ff6b6b;">クイズが見つかりませんでした。`quizzes` フォルダの中に JSON ファイルがあるか確認してください。</p>
+          <p style="color: #ff6b6b;">クイズが見つかりませんでした。`quizzes` フォルダ内に XML ファイルがあるか確認してください。</p>
         <?php endif; ?>
       </div>
     </section>

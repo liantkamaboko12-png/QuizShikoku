@@ -2,36 +2,45 @@
 header('Content-Type: text/html; charset=UTF-8');
 
 $id = basename($_GET['id'] ?? '');
-$filePath = __DIR__ . "/quizzes/{$id}.json";
+$filePath = __DIR__ . "/quizzes/{$id}.xml";
 
 if (!$id || !file_exists($filePath) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: index.php");
     exit;
 }
 
-$quiz = json_decode(file_get_contents($filePath), true);
-$userAnswers = $_POST['answers'] ?? [];
+libxml_use_internal_errors(true);
+$xml = simplexml_load_file($filePath);
 
+if (!$xml) {
+    header("Location: index.php");
+    exit;
+}
+
+$userAnswers = $_POST['answers'] ?? [];
 $score = 0;
-$total = count($quiz['questions']);
+$questions = $xml->questions->question ?? [];
+$total = count($questions);
 $results = [];
 
-foreach ($quiz['questions'] as $idx => $q) {
-    $type = $q['type'] ?? 'radio';
+foreach ($questions as $idx => $q) {
+    $qType = (string)($q['type'] ?? 'radio');
+    $qText = (string)($q->text ?? '');
     $userAns = $userAnswers[$idx] ?? '';
 
-    if ($type === 'multi_text') {
+    if ($qType === 'multi_text') {
         $isCorrect = true;
         $userAnsList = [];
         $correctAnsList = [];
 
-        foreach ($q['inputs'] as $input) {
-            $key = $input['key'];
+        foreach ($q->inputs->input as $input) {
+            $key = (string)$input['key'];
+            $label = (string)($input['label'] ?? $key);
             $uVal = trim($userAns[$key] ?? '');
-            $cVal = trim($input['answer']);
+            $cVal = trim((string)$input['answer']);
 
-            $userAnsList[] = "{$input['label']}: " . ($uVal !== '' ? $uVal : '未回答');
-            $correctAnsList[] = "{$input['label']}: {$cVal}";
+            $userAnsList[] = "{$label}: " . ($uVal !== '' ? $uVal : '未回答');
+            $correctAnsList[] = "{$label}: {$cVal}";
 
             if ($uVal !== $cVal) {
                 $isCorrect = false;
@@ -41,21 +50,21 @@ foreach ($quiz['questions'] as $idx => $q) {
         if ($isCorrect) $score++;
 
         $results[] = [
-            'question' => $q['question'],
+            'question' => $qText,
             'user_answer' => implode(' / ', $userAnsList),
             'correct_answer' => implode(' / ', $correctAnsList),
             'is_correct' => $isCorrect
         ];
 
-    } elseif ($type === 'text') {
+    } elseif ($qType === 'text') {
         $uVal = trim(is_array($userAns) ? '' : $userAns);
-        $cVal = trim($q['answer']);
+        $cVal = trim((string)$q->answer);
         $isCorrect = ($uVal === $cVal);
 
         if ($isCorrect) $score++;
 
         $results[] = [
-            'question' => $q['question'],
+            'question' => $qText,
             'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
             'is_correct' => $isCorrect
@@ -63,13 +72,13 @@ foreach ($quiz['questions'] as $idx => $q) {
 
     } else {
         $uVal = is_array($userAns) ? '' : $userAns;
-        $cVal = $q['answer'];
+        $cVal = (string)$q->answer;
         $isCorrect = ($uVal === $cVal);
 
         if ($isCorrect) $score++;
 
         $results[] = [
-            'question' => $q['question'],
+            'question' => $qText,
             'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
             'is_correct' => $isCorrect
@@ -82,7 +91,7 @@ foreach ($quiz['questions'] as $idx => $q) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>結果発表 - <?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></title>
+  <title>結果発表 - <?= htmlspecialchars((string)($xml->title ?? ''), ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -125,7 +134,7 @@ foreach ($quiz['questions'] as $idx => $q) {
         <?php endforeach; ?>
       </div>
 
-      <div class="form-actions btn-group-mobile">
+      <div class="form-actions">
         <a href="quiz.php?id=<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" class="metro-btn secondary-btn">もう一度挑戦する</a>
         <a href="index.php" class="metro-btn primary-btn">トップへ戻る</a>
       </div>

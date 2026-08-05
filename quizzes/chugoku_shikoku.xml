@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<quiz>
+  <title>中国・四国地方</title>
+  <description>地理・歴史の確認テスト（全9問）</description>
+  <color>#0078D7</color>
+  <questions>
+
+    <question id="1" type="multi_text">
+      <image>1.gif</image>
+      <text>Z, S, Vそれぞれの名前を回答してください。</text>
+      <inputs>
+        <input key="Z" label="Z" answer="四万十川" />
+        <input key="S" label="S" answer="中国山地" />
+        <input key="V" label="V" answer="四国山地" />
+      </inputs>
+    </question>
+
+    <question id="2" type="multi_text">
+      <image>2.gif</image>
+      <text>R, G, Bそれぞれの都市名を回答してください。</text>
+      <inputs>
+        <input key="R" label="R" answer="松山市" />
+        <input key="G" label="G" answer="広島市" />
+        <input key="B" label="B" answer="高松市" />
+      </inputs>
+    </question>
+
+    <question id="3" type="text">
+      <image>3.gif</image>
+      <text>この地域の名称を回答してください</text>
+      <answer>瀬戸内工業地域</answer>
+    </question>
+
+    <question id="4" type="radio">
+      <text><![CDATA[なぜ山陰には多く雪が積もるかQ, W, E, Rから回答を選択してください
+Q: 西から東へ吹く偏西風の影響
+W: 日本海流（黒潮）の影響
+E: 北から吹く北西からの季節風の影響
+R: 対馬海流の影響]]></text>
+      <options>
+        <option>Q</option>
+        <option>W</option>
+        <option>E</option>
+        <option>R</option>
+      </options>
+      <answer>E</answer>
+    </question>
+
+    <question id="5" type="radio">
+      <image>5.gif</image>
+      <text>かんきつ類生産量日本一位の中国・四国地方の都道府県を選択してください</text>
+      <options>
+        <option>岡山県</option>
+        <option>高知県</option>
+        <option>広島県</option>
+        <option>愛媛県</option>
+        <option>鳥取県</option>
+      </options>
+      <answer>愛媛県</answer>
+    </question>
+
+    <question id="6" type="radio">
+      <text>瀬戸内海沿岸で古くからさかんだった産業は造船、綿織物、後は何？</text>
+      <options>
+        <option>製薬</option>
+        <option>製塩</option>
+        <option>観光</option>
+        <option>火薬</option>
+      </options>
+      <answer>製塩</answer>
+    </question>
+
+    <question id="7" type="radio">
+      <image>7.gif</image>
+      <text>本州四国連絡橋のなかで特に重要な瀬戸大橋は二層構造になっています。上には自動車道が通っていますが、下には何が通っていますか？</text>
+      <options>
+        <option>自転車専用道</option>
+        <option>歩道</option>
+        <option>鉄道</option>
+        <option>バス道</option>
+      </options>
+      <answer>鉄道</answer>
+    </question>
+
+    <question id="8" type="radio">
+      <image>8.gif</image>
+      <text><![CDATA[本州四国連絡橋により移動が便利になりましたが、四国などは特に、問題になっているのはどのようなことですか？A, D, G, Jから回答を選択してください。
+A: 大阪市などの大都市に客が吸い寄せられてしまったため、地方都市の経済が衰退してしまう。
+D: 大きな橋や高速道路の維持費が巨大化し、自治体が赤字・財政難に陥る
+G: 橋の建設により大型船が通行できなくなり経済的な損失が出る。
+J: 道路や橋を維持するための作業員が足りなくなる]]></text>
+      <options>
+        <option>A</option>
+        <option>D</option>
+        <option>G</option>
+        <option>J</option>
+      </options>
+      <answer>A</answer>
+    </question>
+
+    <question id="9" type="text">
+      <image>9.gif</image>
+      <text>気候が温暖な高知平野などでは、夏が旬であるなすやピーマンなどの野菜を端境期にあたる冬から春にかけて出荷するため、ビニールハウスを使用したとあることを行っています。キーボードで漢字4文字を入力してください。</text>
+      <answer>促成栽培</answer>
+    </question>
+
+  </questions>
+</quiz>
