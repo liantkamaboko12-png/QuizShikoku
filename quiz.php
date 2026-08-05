@@ -1,4 +1,7 @@
 <?php
+// æ–‡å­—åŒ–ã‘é˜²æ­¢ãƒ˜ãƒƒãƒ€ãƒ¼ã®å‡ºåŠ›
+header('Content-Type: text/html; charset=UTF-8');
+
 $id = $_GET['id'] ?? '';
 $filePath = "quizzes/{$id}.json";
 
@@ -14,33 +17,33 @@ $quiz = json_decode(file_get_contents($filePath), true);
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= htmlspecialchars($quiz['title']) ?> - Ğ‰ï‰È–â‘èW</title>
+  <title><?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?> - ç¤¾ä¼šç§‘å•é¡Œé›†</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
     <div class="header-container">
-      <a href="index.php" class="brand-title">Ğ‰ï‰È QUIZ HUB</a>
+      <a href="index.php" class="brand-title">ç¤¾ä¼šç§‘ QUIZ HUB</a>
     </div>
   </header>
 
   <main class="main-container">
     <section class="metro-section">
-      <div class="breadcrumb"><a href="index.php">© ƒR[ƒXˆê——‚É–ß‚é</a></div>
-      <h1 class="page-title"><?= htmlspecialchars($quiz['title']) ?></h1>
+      <div class="breadcrumb"><a href="index.php">â† ã‚³ãƒ¼ã‚¹ä¸€è¦§ã«æˆ»ã‚‹</a></div>
+      <h1 class="page-title"><?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></h1>
 
-      <form action="result.php?id=<?= htmlspecialchars($id) ?>" method="POST" class="quiz-form">
+      <form action="result.php?id=<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" method="POST" class="quiz-form">
         <?php foreach ($quiz['questions'] as $idx => $q): ?>
           <div class="metro-card">
             <div class="question-number">Q<?= $idx + 1 ?></div>
 
             <?php if (!empty($q['image'])): ?>
               <div class="question-image" style="margin-bottom: 16px;">
-                <img src="images/<?= htmlspecialchars($q['image']) ?>" alt="–â‘è‰æ‘œ" style="max-width: 100%; height: auto; border: 1px solid #333;">
+                <img src="images/<?= htmlspecialchars($q['image'], ENT_QUOTES, 'UTF-8') ?>" alt="å•é¡Œç”»åƒ" style="max-width: 100%; height: auto; border: 1px solid #333;">
               </div>
             <?php endif; ?>
 
-            <p class="question-text"><?= nl2br(htmlspecialchars($q['question'])) ?></p>
+            <p class="question-text"><?= nl2br(htmlspecialchars($q['question'] ?? '', ENT_QUOTES, 'UTF-8')) ?></p>
 
             <?php $type = $q['type'] ?? 'radio'; ?>
 
@@ -48,23 +51,23 @@ $quiz = json_decode(file_get_contents($filePath), true);
               <div class="multi-input-group">
                 <?php foreach ($q['inputs'] as $input): ?>
                   <div class="input-row">
-                    <label class="input-label"><?= htmlspecialchars($input['label']) ?>:</label>
-                    <input type="text" name="answers[<?= $idx ?>][<?= htmlspecialchars($input['key']) ?>]" class="metro-input" placeholder="‰ñ“š‚ğ“ü—Í" required>
+                    <label class="input-label"><?= htmlspecialchars($input['label'] ?? '', ENT_QUOTES, 'UTF-8') ?>:</label>
+                    <input type="text" name="answers[<?= $idx ?>][<?= htmlspecialchars($input['key'] ?? '', ENT_QUOTES, 'UTF-8') ?>]" class="metro-input" placeholder="å›ç­”ã‚’å…¥åŠ›" required>
                   </div>
                 <?php endforeach; ?>
               </div>
 
             <?php elseif ($type === 'text'): ?>
               <div class="single-input-group">
-                <input type="text" name="answers[<?= $idx ?>]" class="metro-input" placeholder="‰ñ“š‚ğ“ü—Í‚µ‚Ä‚­‚¾‚³‚¢" required>
+                <input type="text" name="answers[<?= $idx ?>]" class="metro-input" placeholder="å›ç­”ã‚’å…¥åŠ›ã—ã¦ãã ã•ã„" required>
               </div>
 
             <?php else: ?>
               <div class="options-grid">
                 <?php foreach ($q['options'] as $opt): ?>
                   <label class="option-tile">
-                    <input type="radio" name="answers[<?= $idx ?>]" value="<?= htmlspecialchars($opt) ?>" required>
-                    <span class="tile-label"><?= htmlspecialchars($opt) ?></span>
+                    <input type="radio" name="answers[<?= $idx ?>]" value="<?= htmlspecialchars($opt, ENT_QUOTES, 'UTF-8') ?>" required>
+                    <span class="tile-label"><?= htmlspecialchars($opt, ENT_QUOTES, 'UTF-8') ?></span>
                   </label>
                 <?php endforeach; ?>
               </div>
@@ -74,7 +77,7 @@ $quiz = json_decode(file_get_contents($filePath), true);
         <?php endforeach; ?>
 
         <div class="form-actions">
-          <button type="submit" class="metro-btn primary-btn">‘S–â‚Ì“š‚¦‡‚í‚¹‚ğ‚·‚é</button>
+          <button type="submit" class="metro-btn primary-btn">å…¨å•ã®ç­”ãˆåˆã‚ã›ã‚’ã™ã‚‹</button>
         </div>
       </form>
     </section>

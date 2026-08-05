@@ -1,4 +1,7 @@
 <?php
+// 文字化け防止ヘッダーの出力
+header('Content-Type: text/html; charset=UTF-8');
+
 $id = $_GET['id'] ?? '';
 $filePath = "quizzes/{$id}.json";
 
@@ -28,7 +31,7 @@ foreach ($quiz['questions'] as $idx => $q) {
             $uVal = trim($userAns[$key] ?? '');
             $cVal = trim($input['answer']);
 
-            $userAnsList[] = "{$input['label']}: " . ($uVal !== '' ? $uVal : '����');
+            $userAnsList[] = "{$input['label']}: " . ($uVal !== '' ? $uVal : '未回答');
             $correctAnsList[] = "{$input['label']}: {$cVal}";
 
             if ($uVal !== $cVal) {
@@ -54,7 +57,7 @@ foreach ($quiz['questions'] as $idx => $q) {
 
         $results[] = [
             'question' => $q['question'],
-            'user_answer' => $uVal !== '' ? $uVal : '����',
+            'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
             'is_correct' => $isCorrect
         ];
@@ -68,7 +71,7 @@ foreach ($quiz['questions'] as $idx => $q) {
 
         $results[] = [
             'question' => $q['question'],
-            'user_answer' => $uVal !== '' ? $uVal : '����',
+            'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
             'is_correct' => $isCorrect
         ];
@@ -80,22 +83,22 @@ foreach ($quiz['questions'] as $idx => $q) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>���ʔ��\ - <?= htmlspecialchars($quiz['title']) ?></title>
+  <title>結果発表 - <?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
     <div class="header-container">
-      <a href="index.php" class="brand-title">�Љ�� QUIZ HUB</a>
+      <a href="index.php" class="brand-title">社会科 QUIZ HUB</a>
     </div>
   </header>
 
   <main class="main-container">
     <section class="metro-section">
-      <h1 class="page-title">���ʔ��\</h1>
+      <h1 class="page-title">結果発表</h1>
 
       <div class="score-card">
-        <div class="score-label">���Ȃ��̃X�R�A</div>
+        <div class="score-label">あなたのスコア</div>
         <div class="score-num"><?= $score ?> / <?= $total ?></div>
       </div>
 
@@ -105,27 +108,27 @@ foreach ($quiz['questions'] as $idx => $q) {
             <div class="result-header">
               <span class="q-num">Q<?= $idx + 1 ?></span>
               <?php if ($res['is_correct']): ?>
-                <span class="badge badge-correct">���� ��</span>
+                <span class="badge badge-correct">正解 ◯</span>
               <?php else: ?>
-                <span class="badge badge-wrong">�s���� ?</span>
+                <span class="badge badge-wrong">不正解 ×</span>
               <?php endif; ?>
             </div>
 
-            <p class="question-text"><?= nl2br(htmlspecialchars($res['question'])) ?></p>
+            <p class="question-text"><?= nl2br(htmlspecialchars($res['question'], ENT_QUOTES, 'UTF-8')) ?></p>
 
             <div class="answer-comparison">
-              <p>���Ȃ��̉�: <strong><?= htmlspecialchars($res['user_answer']) ?></strong></p>
+              <p>あなたの回答: <strong><?= htmlspecialchars($res['user_answer'], ENT_QUOTES, 'UTF-8') ?></strong></p>
               <?php if (!$res['is_correct']): ?>
-                <p class="correct-text">��������: <strong><?= htmlspecialchars($res['correct_answer']) ?></strong></p>
+                <p class="correct-text">正しい解答: <strong><?= htmlspecialchars($res['correct_answer'], ENT_QUOTES, 'UTF-8') ?></strong></p>
               <?php endif; ?>
             </div>
           </div>
         <?php endforeach; ?>
       </div>
 
-      <div class="form-actions">
-        <a href="quiz.php?id=<?= htmlspecialchars($id) ?>" class="metro-btn secondary-btn">������x���킷��</a>
-        <a href="index.php" class="metro-btn primary-btn">�g�b�v�֖߂�</a>
+      <div class="form-actions btn-group-mobile">
+        <a href="quiz.php?id=<?= htmlspecialchars($id, ENT_QUOTES, 'UTF-8') ?>" class="metro-btn secondary-btn">もう一度挑戦する</a>
+        <a href="index.php" class="metro-btn primary-btn">トップへ戻る</a>
       </div>
     </section>
   </main>

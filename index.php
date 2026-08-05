@@ -1,5 +1,8 @@
 <?php
-// quizzes/ “à‚Ì JSON ƒtƒ@ƒCƒ‹‚ğ‚·‚×‚ÄŒŸõ‚µ‚Ä“Ç‚İ‚Ş
+// æ–‡å­—åŒ–ã‘é˜²æ­¢ãƒ˜ãƒƒãƒ€ãƒ¼ã®å‡ºåŠ›
+header('Content-Type: text/html; charset=UTF-8');
+
+// quizzes/ å†…ã® JSON ãƒ•ã‚¡ã‚¤ãƒ«ã‚’ã™ã¹ã¦æ¤œç´¢ã—ã¦èª­ã¿è¾¼ã‚€
 $quizFiles = glob('quizzes/*.json');
 $quizzes = [];
 
@@ -14,26 +17,26 @@ foreach ($quizFiles as $file) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ğ‰ï‰È–â‘èW</title>
+  <title>ç¤¾ä¼šç§‘å•é¡Œé›†</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="app-header">
     <div class="header-container">
-      <a href="index.php" class="brand-title">Ğ‰ï‰È QUIZ HUB</a>
+      <a href="index.php" class="brand-title">ç¤¾ä¼šç§‘ QUIZ HUB</a>
     </div>
   </header>
 
   <main class="main-container">
     <section class="metro-section">
-      <h1 class="page-title">ƒR[ƒX‚ğ‘I‘ğ</h1>
+      <h1 class="page-title">ã‚³ãƒ¼ã‚¹ã‚’é¸æŠ</h1>
       <div class="tile-grid">
         <?php foreach ($quizzes as $key => $quiz): ?>
-          <a href="quiz.php?id=<?= htmlspecialchars($key) ?>" class="tile" style="background-color: <?= htmlspecialchars($quiz['color'] ?? '#0078D7') ?>;">
+          <a href="quiz.php?id=<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" class="tile" style="background-color: <?= htmlspecialchars($quiz['color'] ?? '#0078D7', ENT_QUOTES, 'UTF-8') ?>;">
             <div class="tile-content">
-              <h2><?= htmlspecialchars($quiz['title']) ?></h2>
-              <p><?= htmlspecialchars($quiz['description']) ?></p>
-              <span class="badge"><?= count($quiz['questions'] ?? []) ?> –â</span>
+              <h2><?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></h2>
+              <p><?= htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+              <span class="badge"><?= count($quiz['questions'] ?? []) ?> å•</span>
             </div>
           </a>
         <?php endforeach; ?>
