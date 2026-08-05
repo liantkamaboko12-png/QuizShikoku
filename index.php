@@ -2,14 +2,16 @@
 // 文字化け防止ヘッダーの出力
 header('Content-Type: text/html; charset=UTF-8');
 
-// quizzes/ 内の JSON ファイルをすべて検索して読み込む
-$quizFiles = glob('quizzes/*.json');
+// __DIR__ を使って絶対パスで quizzes フォルダ内の JSON を検索
+$quizFiles = glob(__DIR__ . '/quizzes/*.json');
 $quizzes = [];
 
-foreach ($quizFiles as $file) {
-    $key = pathinfo($file, PATHINFO_FILENAME);
-    $json = file_get_contents($file);
-    $quizzes[$key] = json_decode($json, true);
+if ($quizFiles !== false) {
+    foreach ($quizFiles as $file) {
+        $key = pathinfo($file, PATHINFO_FILENAME);
+        $json = file_get_contents($file);
+        $quizzes[$key] = json_decode($json, true);
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -31,15 +33,19 @@ foreach ($quizFiles as $file) {
     <section class="metro-section">
       <h1 class="page-title">コースを選択</h1>
       <div class="tile-grid">
-        <?php foreach ($quizzes as $key => $quiz): ?>
-          <a href="quiz.php?id=<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" class="tile" style="background-color: <?= htmlspecialchars($quiz['color'] ?? '#0078D7', ENT_QUOTES, 'UTF-8') ?>;">
-            <div class="tile-content">
-              <h2><?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></h2>
-              <p><?= htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
-              <span class="badge"><?= count($quiz['questions'] ?? []) ?> 問</span>
-            </div>
-          </a>
-        <?php endforeach; ?>
+        <?php if (!empty($quizzes)): ?>
+          <?php foreach ($quizzes as $key => $quiz): ?>
+            <a href="quiz.php?id=<?= htmlspecialchars($key, ENT_QUOTES, 'UTF-8') ?>" class="tile" style="background-color: <?= htmlspecialchars($quiz['color'] ?? '#0078D7', ENT_QUOTES, 'UTF-8') ?>;">
+              <div class="tile-content">
+                <h2><?= htmlspecialchars($quiz['title'] ?? '', ENT_QUOTES, 'UTF-8') ?></h2>
+                <p><?= htmlspecialchars($quiz['description'] ?? '', ENT_QUOTES, 'UTF-8') ?></p>
+                <span class="badge"><?= count($quiz['questions'] ?? []) ?> 問</span>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p style="color: #ff6b6b;">クイズが見つかりませんでした。`quizzes` フォルダの中に JSON ファイルがあるか確認してください。</p>
+        <?php endif; ?>
       </div>
     </section>
   </main>

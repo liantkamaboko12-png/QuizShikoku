@@ -1,9 +1,8 @@
 <?php
-// 文字化け防止ヘッダーの出力
 header('Content-Type: text/html; charset=UTF-8');
 
-$id = $_GET['id'] ?? '';
-$filePath = "quizzes/{$id}.json";
+$id = basename($_GET['id'] ?? ''); // 安全のためファイル名のみ抽出
+$filePath = __DIR__ . "/quizzes/{$id}.json";
 
 if (!$id || !file_exists($filePath)) {
     header("Location: index.php");
