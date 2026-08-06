@@ -19,7 +19,13 @@ function loadQuizFile($filePath) {
     return null;
 }
 
-if (!$id || in_array("{$id}.php", $systemFiles, true) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
+// 全角スペースも半角スペースに変換してトリムする関数
+function cleanInput($str) {
+    if (!is_string($str)) return '';
+    return trim(mb_convert_kana($str, 's', 'UTF-8'));
+}
+
+if (!$id || !preg_match('/^[a-zA-Z0-9_-]+$/', $id) || in_array("{$id}.php", $systemFiles, true) || $_SERVER['REQUEST_METHOD'] !== 'POST') {
     header("Location: index.php");
     exit;
 }
@@ -46,8 +52,8 @@ foreach ($quiz['questions'] as $idx => $q) {
 
         foreach ($q['inputs'] as $input) {
             $key = $input['key'];
-            $uVal = trim($userAns[$key] ?? '');
-            $cVal = trim($input['answer']);
+            $uVal = cleanInput($userAns[$key] ?? '');
+            $cVal = cleanInput($input['answer']);
 
             $userAnsList[] = "{$input['label']}: " . ($uVal !== '' ? $uVal : '未回答');
             $correctAnsList[] = "{$input['label']}: {$cVal}";
@@ -67,8 +73,8 @@ foreach ($quiz['questions'] as $idx => $q) {
         ];
 
     } elseif ($type === 'text') {
-        $uVal = trim(is_array($userAns) ? '' : $userAns);
-        $cVal = trim($q['answer']);
+        $uVal = cleanInput(is_array($userAns) ? '' : $userAns);
+        $cVal = cleanInput($q['answer']);
         $isCorrect = ($uVal === $cVal);
 
         if ($isCorrect) $score++;
@@ -77,6 +83,25 @@ foreach ($quiz['questions'] as $idx => $q) {
             'question' => $q['question'],
             'user_answer' => $uVal !== '' ? $uVal : '未回答',
             'correct_answer' => $cVal,
+            'is_correct' => $isCorrect
+        ];
+
+    } elseif ($type === 'checkbox') {
+        $uVals = is_array($userAns) ? array_map('cleanInput', $userAns) : [];
+        $cVals = array_map('cleanInput', (array)($q['answer'] ?? []));
+
+        // 順序によらず一致判定するためにソート
+        sort($uVals);
+        sort($cVals);
+
+        $isCorrect = ($uVals === $cVals);
+
+        if ($isCorrect) $score++;
+
+        $results[] = [
+            'question' => $q['question'],
+            'user_answer' => !empty($uVals) ? implode('、', $uVals) : '選択なし',
+            'correct_answer' => implode('、', $cVals),
             'is_correct' => $isCorrect
         ];
 

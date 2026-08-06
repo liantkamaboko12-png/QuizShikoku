@@ -19,7 +19,8 @@ function loadQuizFile($filePath) {
     return null;
 }
 
-if (!$id || in_array("{$id}.php", $systemFiles, true)) {
+// $id のバリデーション強化（英数字・ハイフン・アンダースコアのみ許可）
+if (!$id || !preg_match('/^[a-zA-Z0-9_-]+$/', $id) || in_array("{$id}.php", $systemFiles, true)) {
     header("Location: index.php");
     exit;
 }
@@ -78,6 +79,16 @@ if ($quiz === null) {
             <?php elseif ($type === 'text'): ?>
               <div class="single-input-group">
                 <input type="text" name="answers[<?= $idx ?>]" class="metro-input" placeholder="回答を入力してください" required>
+              </div>
+
+            <?php elseif ($type === 'checkbox'): ?>
+              <div class="options-grid">
+                <?php foreach ($q['options'] as $opt): ?>
+                  <label class="option-tile">
+                    <input type="checkbox" name="answers[<?= $idx ?>][]" value="<?= htmlspecialchars($opt, ENT_QUOTES, 'UTF-8') ?>">
+                    <span class="tile-label"><?= htmlspecialchars($opt, ENT_QUOTES, 'UTF-8') ?></span>
+                  </label>
+                <?php endforeach; ?>
               </div>
 
             <?php else: ?>
