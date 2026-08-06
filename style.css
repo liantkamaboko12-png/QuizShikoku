@@ -121,6 +121,9 @@ a {
   word-break: break-word;
 }
 
+/* ==========================================
+   Metro UI Tile Selection (ラジオ/チェックボックス共通デザイン)
+   ========================================== */
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -128,27 +131,73 @@ a {
 }
 
 .option-tile {
+  position: relative;
   display: flex;
   align-items: center;
-  background-color: #2d2d2d;
-  padding: 16px;
-  min-height: 52px; /* スマホでの誤タップを防ぐ高さ確保 */
+  background-color: #2b2b2b;
+  border: 2px solid #3d3d3d;
+  padding: 16px 20px;
+  min-height: 56px;
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: background-color 0.15s;
+  user-select: none;
+  transition: all 0.15s ease;
   touch-action: manipulation;
+  overflow: hidden;
 }
 
-.option-tile:hover, .option-tile:active {
-  background-color: #383838;
+/* ブラウザ標準のラジオボタン／四角いチェックボックスを完全に不可視化 */
+.option-tile input[type="radio"],
+.option-tile input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
-.option-tile input[type="radio"] {
-  margin-right: 12px;
-  accent-color: #0078D7;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
+.tile-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e0e0e0;
+  z-index: 1;
+}
+
+/* ホバー時の境界線強調 */
+.option-tile:hover {
+  background-color: #353535;
+  border-color: #0078D7;
+}
+
+/* 選択（チェック）された状態のタイル表現 */
+.option-tile:has(input:checked) {
+  background-color: #0078D7;
+  border-color: #00a4ef;
+  transform: scale(0.98); /* 押し込まれる打鍵フィードバック */
+}
+
+.option-tile:has(input:checked) .tile-label {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Metro UI 特有の「右下コーナーの三角チェックバッジ」 */
+.option-tile:has(input:checked)::after {
+  content: "✓";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 30px;
+  height: 30px;
+  background-color: #00a4ef;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  padding-right: 4px;
+  padding-bottom: 2px;
+  clip-path: polygon(100% 0, 0 100%, 100% 100%);
 }
 
 /* Metro Input Forms */
